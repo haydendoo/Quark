@@ -1,0 +1,9 @@
+.git
+build
+.github
+.gitignore
+.vscode
+Dockerfile
+docker-compose.yml
+LICENSE
+*.md
