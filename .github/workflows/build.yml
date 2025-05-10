@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build docker image
-        run: docker compose up --build -d --wait --wait-timeout 120
+        run: docker compose up --build -d
     
       - name: Extract branch name
         shell: bash
