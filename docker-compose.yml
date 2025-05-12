@@ -4,3 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: quark-container
+    volumes:
+      - ./src:/app/src
+      - ./includes:/app/includes
+    command: ["sleep", "infinity"]

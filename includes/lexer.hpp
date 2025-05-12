@@ -2,6 +2,8 @@
 
 #include "constants.hpp"
 #include <string>
+#include <cstddef>
+#include <utility>
 
 struct Token {
     TokenType type;
@@ -30,7 +32,7 @@ private:
 
 public:
     Lexer() = default;
-    Lexer(std::string &source): m_source(std::move(source)) {}
+    Lexer(std::string source): m_source(std::move(source)) {}
 
     auto get_next_token() -> Token;
 };

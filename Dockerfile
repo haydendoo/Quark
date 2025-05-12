@@ -8,12 +8,19 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libzstd-dev \
     libcurl4-openssl-dev \
-    libedit-dev
+    libedit-dev \
+    clang-tidy
 
 WORKDIR /app
 
 COPY . .
 
-RUN cmake . && make
+RUN mkdir build && cd build \
+    && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. \
+    && make
 
-CMD ["./Quark", "main.qrk", "-o", "main"]
+RUN ./lint.sh
+
+RUN ./build/Quark main.qrk -o main
+
+CMD ["sleep", "infinity"]

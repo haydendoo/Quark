@@ -1,6 +1,9 @@
 #include "lexer.hpp"
+#include "constants.hpp"
+
 #include <stdexcept>
-#include <iostream>
+#include <string>
+#include <cctype>
 
 auto token_to_string(const TokenType token) -> std::string {
     switch (token) {
@@ -66,7 +69,7 @@ inline void Lexer::m_skip_inline_comment() noexcept {
 }
 
 inline void Lexer::m_skip_block_comment() {
-    while (m_pos+1 < m_source.size() && !(m_source[m_pos] == '*' && m_source[m_pos+1] == '/')) {
+    while (m_pos+1 < m_source.size() && (m_source[m_pos] != '*' || m_source[m_pos+1] != '/')) {
         ++m_pos;
     }
     if (m_pos+1 < m_source.size() && m_source[m_pos] == '*' && m_source[m_pos+1] == '/') {
@@ -92,10 +95,7 @@ void Lexer::m_skip_whitespace_and_comments() {
 }
 
 auto Lexer::m_read_single_char_token() noexcept -> Token {
-    char current = m_source[m_pos];
-    ++m_pos;
-
-    switch(current) {
+    switch(m_source[m_pos++]) {
         case '(': return Token{TokenType::LPAREN, "("};
         case ')': return Token{TokenType::RPAREN, ")"};
         case '{': return Token{TokenType::LBRACE, "{"};
@@ -117,9 +117,10 @@ auto Lexer::m_read_single_char_token() noexcept -> Token {
         case '<': return Token{TokenType::LESS, "<"};
         case '>': return Token{TokenType::GREATER, ">"};
         case '!': return Token{TokenType::EXCLAMATION_MARK, "!"};
+        default:
+            --m_pos;
+            break;
     }
-
-    --m_pos; // Go back to the original position
     return Token{TokenType::INVALID_TOKEN, ""};
 }
 
@@ -140,7 +141,7 @@ auto Lexer::m_read_number() noexcept -> Token {
         
     ++m_pos;
     while (m_pos < m_source.size()) {
-        char next = m_source[m_pos];
+        const char next = m_source[m_pos];
         if (isdigit(next) != 0) {
             number += next;
         }

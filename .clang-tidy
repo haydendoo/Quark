@@ -9,3 +9,5 @@ Checks: >
   -misc-no-recursion,
   clang-analyzer-*,
   modernize-*
+
+WarningsAsErrors: '*'

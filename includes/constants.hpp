@@ -4,8 +4,9 @@
 #include <utility>
 #include <unordered_map>
 #include <string>
+#include <cstdint>
 
-enum class TokenType {
+enum class TokenType : std::uint8_t {
     // Single character tokens
     LPAREN, RPAREN,
     LBRACE, RBRACE,
