@@ -1,19 +1,19 @@
-FROM alpine:latest AS build
+FROM ubuntu:latest
 
-RUN apk add --no-cache \
-    build-base \
+RUN apt-get update && apt-get install -y \
+    build-essential \
     cmake \
-    g++
+    g++ \
+    llvm-dev \
+    zlib1g-dev \
+    libzstd-dev \
+    libcurl4-openssl-dev \
+    libedit-dev
 
 WORKDIR /app
 
 COPY . .
 
 RUN cmake . && make
-
-FROM scratch
-
-COPY --from=build /app/Quark /Quark
-COPY main.qrk .
 
 CMD ["./Quark", "main.qrk", "-o", "main"]

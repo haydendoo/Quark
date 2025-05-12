@@ -1,14 +1,19 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
-int main(int argc, char* argv[]) {
-    std::string input_file, output_file;
+#include "lexer.hpp"
 
+auto main(int argc, char* argv[]) -> int {
     if (argc == 1) {
         std::cerr << "Error: No input file specified." << std::endl;
         return 1;
     }
+
+    std::string input_file;
+    std::string output_file;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -39,9 +44,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "Input file: " << input_file << std::endl;
-    std::cout << "Output file: " << output_file << std::endl;
-    std::cout << "Quark is still under development." << std::endl;
+    // Read input file
+    std::ifstream input_stream(input_file);
+    if (!input_stream.is_open()) {
+        std::cerr << "Error: Failed to open input file: " << input_file << std::endl;
+        return 1;
+    }
+
+    std::stringstream buffer;
+    buffer << input_stream.rdbuf();
+    std::string source_code = buffer.str();
+
+    Lexer lexer(source_code);
+    Token token;
+    while ((token = lexer.get_next_token()).type != TokenType::END_OF_FILE) {
+        std::cout << token_to_string(token.type) << " " << token.value << std::endl;
+    }
 
     return 0;
 }

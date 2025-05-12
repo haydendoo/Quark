@@ -1,0 +1,11 @@
+Checks: >
+  bugprone-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  performance-*,
+  portability-*,
+  readability-*,
+  misc-*,
+  -misc-no-recursion,
+  clang-analyzer-*,
+  modernize-*
