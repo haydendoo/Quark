@@ -6,11 +6,12 @@
 #include <utility>
 
 struct Token {
-    TokenType type;
+    TokenType type = TokenType::INVALID_TOKEN;
     std::string value;
 };
 
 auto token_to_string(TokenType token) -> std::string;
+
 class Lexer {
 private:
     std::string m_source;

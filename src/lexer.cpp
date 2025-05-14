@@ -39,6 +39,7 @@ auto token_to_string(const TokenType token) -> std::string {
         case TokenType::STRING: return "STRING";
         case TokenType::CHAR: return "CHAR";
         case TokenType::BOOLEAN: return "BOOLEAN";
+        case TokenType::FUNC_KEYWORD: return "func";
         case TokenType::VOID_KEYWORD: return "void";
         case TokenType::IMPORT_KEYWORD: return "import";
         case TokenType::INT_KEYWORD: return "int";
@@ -53,8 +54,8 @@ auto token_to_string(const TokenType token) -> std::string {
         case TokenType::RETURN_KEYWORD: return "return";
         case TokenType::TRUE_KEYWORD: return "true";
         case TokenType::FALSE_KEYWORD: return "false";
-        case TokenType::INVALID_TOKEN: return "INVALID_TOKEN";
-        default:
+        case TokenType::INVALID_TOKEN: [[unlikely]] return "INVALID_TOKEN";
+        default: [[unlikely]]
             throw std::runtime_error("Unknown token type");
     }
 }
@@ -135,6 +136,7 @@ auto Lexer::m_read_multi_char_token() noexcept -> Token {
             return {.type = token_type, .value=str};
         }
     }
+    [[likely]]
     return {.type = TokenType::INVALID_TOKEN, .value=""};
 }
 
@@ -194,19 +196,25 @@ auto Lexer::m_read_string() -> Token {
         str += m_source[m_pos];
         ++m_pos;
     }
+
     if (m_pos < m_source.size() && m_source[m_pos] == '"') {
+        [[likely]]
         ++m_pos;
         return {.type = TokenType::STRING, .value=str};
     }
-
+    
+    [[unlikely]]
     throw std::runtime_error("Unterminated string");
 }
 
 auto Lexer::m_read_char() -> Token {
     if (m_pos+2 < m_source.size() && m_source[m_pos+2] == '\'') {
+        [[likely]]
         m_pos += 3;
         return {.type = TokenType::CHAR, .value=std::string(1, m_source[m_pos-2])};
     }
+
+    [[unlikely]]
     throw std::runtime_error("Unterminated character");
 }
 
@@ -255,6 +263,7 @@ auto Lexer::get_next_token() -> Token {
     }
 
     // If we get here, we found an invalid token
+    [[unlikely]]
     logger->error("Found an invalid token");
     throw std::runtime_error("Syntax error");
 }

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <mutex>
 #include <memory>
+#include <string>
 
 enum class Level : std::uint8_t {
     DEBUG,

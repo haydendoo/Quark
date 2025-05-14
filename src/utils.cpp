@@ -5,6 +5,8 @@
 #include <chrono>
 #include <ctime>
 #include <memory>
+#include <mutex>
+#include <string>
 
 std::unique_ptr<QuarkLogger> QuarkLogger::m_instance = nullptr;
 std::mutex QuarkLogger::m_mutex;
@@ -24,7 +26,7 @@ QuarkLogger::~QuarkLogger() {
 
 auto QuarkLogger::get_time() -> std::string {
     auto now = std::chrono::system_clock::now();
-    std::time_t local_time = std::chrono::system_clock::to_time_t(now);
+    const std::time_t local_time = std::chrono::system_clock::to_time_t(now);
 
     std::string result = std::ctime(&local_time);
     result.pop_back();
@@ -42,7 +44,7 @@ auto QuarkLogger::level_to_string(Level level) -> std::string {
 }
 
 void QuarkLogger::log(Level level, const std::string& msg) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    const std::lock_guard<std::mutex> lock(m_mutex);
     if (log_file.is_open()) {
         log_file << "[" << get_time() << "] - [" << level_to_string(level) << "] " << msg << '\n';
     }
@@ -66,7 +68,7 @@ void QuarkLogger::error(const std::string& msg) {
 }
 
 auto QuarkLogger::get_instance() -> QuarkLogger* {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    const std::lock_guard<std::mutex> lock(m_mutex);
     if (m_instance == nullptr) {
         m_instance = std::make_unique<QuarkLogger>();
     }

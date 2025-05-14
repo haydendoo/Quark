@@ -4,12 +4,12 @@
 #include <string>
 
 #include "lexer.hpp"
-#include "constants.hpp"
 #include "utils.hpp"
+#include "constants.hpp"
 
 auto main(int argc, char* argv[]) -> int {
     if (argc == 1) {
-        std::cerr << "Error: No input file specified." << '\n';
+        std::cerr << "Error: No input file specified.\n";
         return 1;
     }
 
@@ -22,26 +22,26 @@ auto main(int argc, char* argv[]) -> int {
             if (i + 1 < argc) {
                 output_file = argv[++i];
             } else {
-                std::cerr << "Error: -o option requires an argument." << '\n';
+                std::cerr << "Error: -o option requires an argument.\n";
                 return 1;
             }
         } else {
             if (input_file.empty()) {
                 input_file = arg;
             } else {
-                std::cerr << "Error: Too many input files specified." << '\n';
+                std::cerr << "Error: Too many input files specified.\n";
                 return 1;
             }
         }
     }
 
     if (input_file.empty()) {
-        std::cerr << "Error: No input file specified." << '\n';
+        std::cerr << "Error: No input file specified.\n";
         return 1;
     }
 
     if (output_file.empty()) {
-        std::cerr << "Error: No output file specified. Use -o <filename>." << '\n';
+        std::cerr << "Error: No output file specified. Use -o <filename>.\n";
         return 1;
     }
 
@@ -58,8 +58,13 @@ auto main(int argc, char* argv[]) -> int {
     // Compilation logic
     auto *logger = QuarkLogger::get_instance();
     logger->info("Quark compilation has started...");
+
     Lexer lexer(buffer.str());
-    lexer.get_next_token();
+    Token token = lexer.get_next_token();
+    while(token.type != TokenType::END_OF_FILE) {
+        token = lexer.get_next_token();
+    }
+
     logger->info("Quark lexing completed...");
     logger->info("Quark compilation done...");
 
