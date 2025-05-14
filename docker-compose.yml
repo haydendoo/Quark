@@ -7,4 +7,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./includes:/app/includes
+      - ./lint.sh:/app/lint.sh
+      - ./CMakeLists.txt:/app/CMakeLists.txt
+      - ./main.qrk:/app/main.qrk
     command: ["sleep", "infinity"]

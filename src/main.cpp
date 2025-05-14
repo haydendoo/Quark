@@ -5,6 +5,7 @@
 
 #include "lexer.hpp"
 #include "constants.hpp"
+#include "utils.hpp"
 
 auto main(int argc, char* argv[]) -> int {
     if (argc == 1) {
@@ -53,13 +54,14 @@ auto main(int argc, char* argv[]) -> int {
 
     std::stringstream buffer;
     buffer << input_stream.rdbuf();
-    const std::string source_code = buffer.str();
 
-    Lexer lexer(source_code);
-    Token token;
-    while ((token = lexer.get_next_token()).type != TokenType::END_OF_FILE) {
-        std::cout << token_to_string(token.type) << " " << token.value << '\n';
-    }
+    // Compilation logic
+    auto *logger = QuarkLogger::get_instance();
+    logger->info("Quark compilation has started...");
+    Lexer lexer(buffer.str());
+    lexer.get_next_token();
+    logger->info("Quark lexing completed...");
+    logger->info("Quark compilation done...");
 
     return 0;
 }

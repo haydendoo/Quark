@@ -1,9 +1,11 @@
 #include "lexer.hpp"
 #include "constants.hpp"
+#include "utils.hpp"
 
 #include <stdexcept>
 #include <string>
 #include <cctype>
+#include <unordered_map>
 
 auto token_to_string(const TokenType token) -> std::string {
     switch (token) {
@@ -38,6 +40,7 @@ auto token_to_string(const TokenType token) -> std::string {
         case TokenType::CHAR: return "CHAR";
         case TokenType::BOOLEAN: return "BOOLEAN";
         case TokenType::VOID_KEYWORD: return "void";
+        case TokenType::IMPORT_KEYWORD: return "import";
         case TokenType::INT_KEYWORD: return "int";
         case TokenType::FLOAT_KEYWORD: return "float";
         case TokenType::STRING_KEYWORD: return "string";
@@ -96,32 +99,32 @@ void Lexer::m_skip_whitespace_and_comments() {
 
 auto Lexer::m_read_single_char_token() noexcept -> Token {
     switch(m_source[m_pos++]) {
-        case '(': return Token{TokenType::LPAREN, "("};
-        case ')': return Token{TokenType::RPAREN, ")"};
-        case '{': return Token{TokenType::LBRACE, "{"};
-        case '}': return Token{TokenType::RBRACE, "}"};
-        case '[': return Token{TokenType::LBRACKET, "["};
-        case ']': return Token{TokenType::RBRACKET, "]"};
-        case ',': return Token{TokenType::COMMA, ","};
-        case ';': return Token{TokenType::SEMICOLON, ";"};
-        case '+': return Token{TokenType::PLUS, "+"};
-        case '-': return Token{TokenType::MINUS, "-"};
-        case '*': return Token{TokenType::ASTERISK, "*"};
+        case '(': return {.type = TokenType::LPAREN, .value="("};
+        case ')': return {.type = TokenType::RPAREN, .value=")"};
+        case '{': return {.type = TokenType::LBRACE, .value="{"};
+        case '}': return {.type = TokenType::RBRACE, .value="}"};
+        case '[': return {.type = TokenType::LBRACKET, .value="["};
+        case ']': return {.type = TokenType::RBRACKET, .value="]"};
+        case ',': return {.type = TokenType::COMMA, .value=","};
+        case ';': return {.type = TokenType::SEMICOLON, .value=";"};
+        case '+': return {.type = TokenType::PLUS, .value="+"};
+        case '-': return {.type = TokenType::MINUS, .value="-"};
+        case '*': return {.type = TokenType::ASTERISK, .value="*"};
         case '/': {
             if (m_pos < m_source.size() && m_source[m_pos] != '/' && m_source[m_pos] != '*') {
-                return Token{TokenType::SLASH, "/"};
+                return {.type = TokenType::SLASH, .value="/"};
             }
             break;
         }
-        case '=': return Token{TokenType::EQUALS, "="};
-        case '<': return Token{TokenType::LESS, "<"};
-        case '>': return Token{TokenType::GREATER, ">"};
-        case '!': return Token{TokenType::EXCLAMATION_MARK, "!"};
+        case '=': return {.type = TokenType::EQUALS, .value="="};
+        case '<': return {.type = TokenType::LESS, .value="<"};
+        case '>': return {.type = TokenType::GREATER, .value=">"};
+        case '!': return {.type = TokenType::EXCLAMATION_MARK, .value="!"};
         default:
             --m_pos;
             break;
     }
-    return Token{TokenType::INVALID_TOKEN, ""};
+    return {.type = TokenType::INVALID_TOKEN, .value=""};
 }
 
 auto Lexer::m_read_multi_char_token() noexcept -> Token {
@@ -129,10 +132,10 @@ auto Lexer::m_read_multi_char_token() noexcept -> Token {
     for(const auto& [str, token_type] : multi_char_token_map) {
         if(m_source.compare(m_pos, str.size(), str) == 0) {
             m_pos += str.size();
-            return Token{token_type, str};
+            return {.type = token_type, .value=str};
         }
     }
-    return Token{TokenType::INVALID_TOKEN, ""};
+    return {.type = TokenType::INVALID_TOKEN, .value=""};
 }
 
 auto Lexer::m_read_number() noexcept -> Token {
@@ -161,9 +164,9 @@ auto Lexer::m_read_number() noexcept -> Token {
     }
         
     if (has_decimal) {
-        return Token{TokenType::FLOAT, number};
+        return {.type = TokenType::FLOAT, .value=number};
     }
-    return Token{TokenType::INTEGER, number};
+    return {.type = TokenType::INTEGER, .value=number};
 }
 
 auto Lexer::m_read_identifier_or_keyword() noexcept -> Token {
@@ -176,11 +179,12 @@ auto Lexer::m_read_identifier_or_keyword() noexcept -> Token {
     }
         
     // Check if it's a keyword
-    if(keyword_map.find(identifier) != keyword_map.end()) {
-        return Token{keyword_map.at(identifier), identifier};
+    auto keyword = keyword_map.find(identifier);
+    if(keyword != keyword_map.end()) {
+        return {.type = keyword->second, .value=identifier};
     }
 
-    return Token{TokenType::IDENTIFIER, identifier};
+    return {.type = TokenType::IDENTIFIER, .value=identifier};
 }
 
 auto Lexer::m_read_string() -> Token {
@@ -192,7 +196,7 @@ auto Lexer::m_read_string() -> Token {
     }
     if (m_pos < m_source.size() && m_source[m_pos] == '"') {
         ++m_pos;
-        return Token{TokenType::STRING, str};
+        return {.type = TokenType::STRING, .value=str};
     }
 
     throw std::runtime_error("Unterminated string");
@@ -201,7 +205,7 @@ auto Lexer::m_read_string() -> Token {
 auto Lexer::m_read_char() -> Token {
     if (m_pos+2 < m_source.size() && m_source[m_pos+2] == '\'') {
         m_pos += 3;
-        return Token{TokenType::CHAR, std::string(1, m_source[m_pos-2])};
+        return {.type = TokenType::CHAR, .value=std::string(1, m_source[m_pos-2])};
     }
     throw std::runtime_error("Unterminated character");
 }
@@ -219,31 +223,38 @@ auto Lexer::m_read_literal() -> Token {
     if(m_source[m_pos] == '\'') {
         return m_read_char();
     }
-    return Token{TokenType::INVALID_TOKEN, ""};
+    return {.type = TokenType::INVALID_TOKEN, .value=""};
 }
 
 auto Lexer::get_next_token() -> Token {
     m_skip_whitespace_and_comments();
 
+    auto *logger = QuarkLogger::get_instance();
+
     if (m_pos >= m_source.size()) {
-        return Token{TokenType::END_OF_FILE, ""};
+        logger->info("Finished lexing source code");
+        return {.type = TokenType::END_OF_FILE, .value=""};
     }
 
     Token token = m_read_multi_char_token();
     if(token.type != TokenType::INVALID_TOKEN) {
+        logger->info("Found multi character token of type: " + token_to_string(token.type));
         return token;
     }
 
     token = m_read_single_char_token();
     if(token.type != TokenType::INVALID_TOKEN) {
+        logger->info("Found single character token of type: " + token_to_string(token.type));
         return token;
     }
 
     token = m_read_literal();
     if(token.type != TokenType::INVALID_TOKEN) {
+        logger->info("Found literal of type: " + token_to_string(token.type));
         return token;
     }
 
     // If we get here, we found an invalid token
+    logger->error("Found an invalid token");
     throw std::runtime_error("Syntax error");
 }

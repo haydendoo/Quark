@@ -45,6 +45,7 @@ enum class TokenType : std::uint8_t {
 
     // Keywords
     VOID_KEYWORD,
+    IMPORT_KEYWORD,
     INT_KEYWORD,
     FLOAT_KEYWORD,
     STRING_KEYWORD,
@@ -81,6 +82,7 @@ static const std::unordered_map<std::string, TokenType> keyword_map = {
     {"true", TokenType::TRUE_KEYWORD},
     {"false", TokenType::FALSE_KEYWORD},
     {"void", TokenType::VOID_KEYWORD},
+    {"import", TokenType::IMPORT_KEYWORD},
     {"int", TokenType::INT_KEYWORD},
     {"float", TokenType::FLOAT_KEYWORD},
     {"string", TokenType::STRING_KEYWORD},

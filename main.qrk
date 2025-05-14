@@ -1,14 +1,15 @@
-(3 + 5) * (2 / 1) ** 1
-if ( condition1 && condition2 || (condition3 && condition4))
- while
-for
-as ; =
-12.12
-01-2.12
-12.
-FOR
-"stringas"'a'
-// jsij 2-1{}!"!:stringasX1=c1
-cs //as 90cu- //1-0d112
-sa
-/*asas as*/as
+import stdio;
+
+void doSomething(string p) {
+    print(p)
+}
+
+int main() {
+    int n = 1;
+    char c = 'a';
+    string s = "test";
+    if(n == 1 && (c == 'a' || s == "test")) {
+        doSomething("abc");
+    }
+    doSomething("aaa");
+}
