@@ -17,7 +17,7 @@ COPY . .
 
 RUN mkdir build && cd build \
     && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. \
-    && make
+    && make -j8
 
 RUN ./lint.sh
 
