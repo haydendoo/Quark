@@ -4,7 +4,7 @@ project(Quark)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(${PROJECT_SOURCE_DIR}/includes)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")

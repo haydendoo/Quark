@@ -6,7 +6,7 @@ services:
     container_name: quark-container
     volumes:
       - ./src:/app/src
-      - ./includes:/app/includes
+      - ./include:/app/include
       - ./lint.sh:/app/lint.sh
       - ./CMakeLists.txt:/app/CMakeLists.txt
       - ./main.qrk:/app/main.qrk
