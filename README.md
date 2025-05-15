@@ -1,2 +1,2 @@
 # Quark
-A programming language
+A programming language made in C++ with LLVM
