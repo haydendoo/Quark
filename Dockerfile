@@ -21,6 +21,6 @@ RUN mkdir build && cd build \
 
 RUN ./lint.sh
 
-RUN ./build/Quark main.qrk -o main
+RUN ./build/quark main.qrk -o main
 
 CMD ["sleep", "infinity"]
