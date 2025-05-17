@@ -1,6 +1,6 @@
 import stdio;
 
-func voi doSomething(string p) {
+func void doSomething(string p) {
     print(p)
 }
 

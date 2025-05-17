@@ -64,7 +64,7 @@ enum class TokenType : std::uint8_t {
     INVALID_TOKEN
 };
 
-static const std::array<std::pair<std::string, TokenType>, 7> multi_char_token_map = {
+inline const std::array<std::pair<std::string, TokenType>, 7> multi_char_token_map = {
     std::make_pair("**", TokenType::EXPONENTIATION),
     std::make_pair("==", TokenType::EQUALS_EQUALS),
     std::make_pair("!=", TokenType::NOT_EQUALS),
@@ -74,7 +74,7 @@ static const std::array<std::pair<std::string, TokenType>, 7> multi_char_token_m
     std::make_pair("||", TokenType::OR),
 };
 
-static const std::unordered_map<std::string, TokenType> keyword_map = {
+inline const std::unordered_map<std::string, TokenType> keyword_map = {
     {"if", TokenType::IF_KEYWORD},
     {"else", TokenType::ELSE_KEYWORD},
     {"while", TokenType::WHILE_KEYWORD},
